@@ -22,6 +22,7 @@ function SignUpForm() {
         const email = (form.elements.namedItem("email") as HTMLInputElement).value
         const password = (form.elements.namedItem("password") as HTMLInputElement).value
 
+        // Step 1 — register
         const res = await fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -36,7 +37,7 @@ function SignUpForm() {
             return
         }
 
-        // Auto sign in after register
+        // Step 2 — auto sign in
         const signInRes = await signIn("credentials", {
             email,
             password,
@@ -44,12 +45,25 @@ function SignUpForm() {
         })
 
         if (signInRes?.error) {
+            // if auto sign in fails, send to sign in page
             router.push("/sign-in")
             return
         }
 
+        // Step 3 — redirect
         router.push(callbackUrl)
         router.refresh()
+    }
+
+    if (loading) {
+        return (
+            <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
+                <div className="text-center">
+                    <div className="h-8 w-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-sm text-ink-muted">Creating your account...</p>
+                </div>
+            </main>
+        )
     }
 
     return (
@@ -104,10 +118,9 @@ function SignUpForm() {
 
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-full rounded-xl bg-brand-blue py-3 text-sm font-semibold text-white hover:bg-brand-indigo transition-colors disabled:opacity-60"
+                            className="w-full rounded-xl bg-brand-blue py-3 text-sm font-semibold text-white hover:bg-brand-indigo transition-colors"
                         >
-                            {loading ? "Creating account..." : "Create Account"}
+                            Create Account
                         </button>
                     </form>
 
