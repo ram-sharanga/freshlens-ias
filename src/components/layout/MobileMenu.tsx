@@ -22,22 +22,50 @@ export default function MobileMenu() {
             </button>
 
             {open && (
-                <div className="absolute left-0 top-16 w-full bg-surface-0 border-b border-surface-3 px-4 py-6 flex flex-col gap-4 shadow-lg">
+                <div className="absolute left-0 top-16 w-full bg-surface-0 border-b border-surface-3 px-6 py-6 flex flex-col gap-4 shadow-lg z-50">
                     {navItems.map((item) => (
-                        <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className="text-sm font-medium text-ink-secondary hover:text-brand-blue transition-colors">
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setOpen(false)}
+                            className="text-sm font-medium text-ink-secondary hover:text-brand-blue transition-colors"
+                        >
                             {item.label}
                         </Link>
                     ))}
                     <hr className="border-surface-3" />
                     {session ? (
                         <>
-                            <Link href="/dashboard" onClick={() => setOpen(false)} className="text-sm font-medium text-ink-secondary">Dashboard</Link>
-                            <button onClick={() => signOut()} className="text-left text-sm font-medium text-brand-red">Sign Out</button>
+                            <Link
+                                href="/dashboard"
+                                onClick={() => setOpen(false)}
+                                className="text-sm font-medium text-ink-secondary hover:text-brand-blue transition-colors"
+                            >
+                                Profile
+                            </Link>
+                            <button
+                                onClick={() => signOut({ callbackUrl: "/" })}
+                                className="text-left text-sm font-medium text-brand-red"
+                            >
+                                Sign Out
+                            </button>
                         </>
                     ) : (
                         <>
-                            <Link href="/sign-in" onClick={() => setOpen(false)} className="text-sm font-medium text-ink-secondary">Sign In</Link>
-                            <Link href="/sign-up" onClick={() => setOpen(false)} className="rounded-lg bg-brand-blue px-4 py-2 text-sm font-medium text-white text-center">Sign Up</Link>
+                            <Link
+                                href="/sign-in"
+                                onClick={() => setOpen(false)}
+                                className="text-sm font-medium text-ink-secondary"
+                            >
+                                Sign In
+                            </Link>
+                            <Link
+                                href="/sign-up"
+                                onClick={() => setOpen(false)}
+                                className="rounded-lg bg-brand-blue px-4 py-2 text-sm font-medium text-white text-center"
+                            >
+                                Sign Up
+                            </Link>
                         </>
                     )}
                 </div>

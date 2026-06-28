@@ -1,8 +1,10 @@
-import { courses } from "@/lib/data"
+import { prisma } from "@/lib/prisma"
 import CourseCard from "@/components/ui/CourseCard"
-import { CourseCategory } from "@/types"
+import Link from "next/link"
 
-const categories: { label: string; value: CourseCategory | "all" }[] = [
+export const dynamic = "force-dynamic"
+
+const categories = [
     { label: "All", value: "all" },
     { label: "Mentorship", value: "mentorship" },
     { label: "Mains", value: "mains" },
@@ -26,14 +28,13 @@ export default async function CoursesPage({
     const { category } = await searchParams
     const active = category ?? "all"
 
-    const filtered = active === "all"
-        ? courses
-        : courses.filter((c) => c.category === active)
+    const courses = await prisma.course.findMany({
+        where: active === "all" ? {} : { category: active },
+        orderBy: { createdAt: "desc" },
+    })
 
     return (
         <main className="min-h-screen bg-surface-1">
-
-            {/* Page header */}
             <div className="bg-surface-0 border-b border-surface-3">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
                     <p className="text-sm font-semibold text-brand-blue uppercase tracking-widest mb-2">
@@ -49,8 +50,6 @@ export default async function CoursesPage({
             </div>
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-
-                {/* Category filter */}
                 <div className="flex flex-wrap gap-2 mb-8">
                     {categories.map((cat) => (
                         <a
@@ -67,15 +66,13 @@ export default async function CoursesPage({
                     ))}
                 </div>
 
-                {/* Results count */}
                 <p className="text-sm text-ink-muted mb-6">
-                    {filtered.length} {filtered.length === 1 ? "course" : "courses"} found
+                    {courses.length} {courses.length === 1 ? "course" : "courses"} found
                 </p>
 
-                {/* Grid */}
-                {filtered.length > 0 ? (
+                {courses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filtered.map((course) => (
+                        {courses.map((course) => (
                             <CourseCard key={course.id} course={course} />
                         ))}
                     </div>
@@ -85,7 +82,6 @@ export default async function CoursesPage({
                         <p className="text-ink-secondary">No courses in this category yet.</p>
                     </div>
                 )}
-
             </div>
         </main >
     )

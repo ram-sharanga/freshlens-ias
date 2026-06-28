@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Course } from "@/types"
+import { Course } from "@prisma/client"
 import { formatPrice, formatDate } from "@/lib/utils"
 
 interface CourseCardProps {
@@ -62,7 +62,7 @@ export default function CourseCard({ course }: CourseCardProps) {
                 <div className="flex items-center gap-3 text-xs text-ink-muted mb-4">
                     <span>{course.lessons} lessons</span>
                     <span>·</span>
-                    <span>Valid till {formatDate(course.validTill)}</span>
+                    <span>Valid till {formatDate(new Date(course.validTill).toISOString())}</span>
                 </div>
 
                 {/* Price row */}

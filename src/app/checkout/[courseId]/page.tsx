@@ -13,7 +13,7 @@ export default async function CheckoutPage({
     const session = await auth()
 
     if (!session?.user?.id) {
-        redirect("/sign-in")
+        redirect(`/sign-in?callbackUrl=/checkout/${courseId}`)
     }
 
     const course = await prisma.course.findUnique({ where: { id: courseId } })

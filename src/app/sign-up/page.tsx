@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 
-export default function SignUpPage() {
+function SignUpForm() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard"
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
@@ -33,12 +35,27 @@ export default function SignUpPage() {
             return
         }
 
-        router.push("/sign-in?registered=true")
+        // Auto sign in after register
+        const { signIn } = await import("next-auth/react")
+        const signInRes = await signIn("credentials", {
+            email,
+            password,
+            redirect: false,
+        })
+
+        if (signInRes?.error) {
+            router.push(`/sign-in?callbackUrl=${callbackUrl}`)
+            return
+        }
+
+        router.push(callbackUrl)
+        router.refresh()
     }
 
     return (
-        <main className="flex-1 flex items-center justify-center px-4 py-24">
+        <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
             <div className="w-full max-w-md">
+
                 <div className="text-center mb-8">
                     <Link href="/" className="text-2xl font-bold text-ink-primary">
                         FreshLens<span className="text-brand-blue">IAS</span>
@@ -50,9 +67,7 @@ export default function SignUpPage() {
                     <form onSubmit={handleSubmit} className="space-y-5">
 
                         <div>
-                            <label className="block text-sm font-medium text-ink-primary mb-1.5">
-                                Full Name
-                            </label>
+                            <label className="block text-sm font-medium text-ink-primary mb-1.5">Full Name</label>
                             <input
                                 name="name"
                                 type="text"
@@ -63,9 +78,7 @@ export default function SignUpPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-ink-primary mb-1.5">
-                                Email
-                            </label>
+                            <label className="block text-sm font-medium text-ink-primary mb-1.5">Email</label>
                             <input
                                 name="email"
                                 type="email"
@@ -76,9 +89,7 @@ export default function SignUpPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-ink-primary mb-1.5">
-                                Password
-                            </label>
+                            <label className="block text-sm font-medium text-ink-primary mb-1.5">Password</label>
                             <input
                                 name="password"
                                 type="password"
@@ -90,9 +101,7 @@ export default function SignUpPage() {
                         </div>
 
                         {error && (
-                            <p className="text-sm text-brand-red bg-brand-red/10 px-4 py-3 rounded-xl">
-                                {error}
-                            </p>
+                            <p className="text-sm text-brand-red bg-brand-red/10 px-4 py-3 rounded-xl">{error}</p>
                         )}
 
                         <button
@@ -102,12 +111,11 @@ export default function SignUpPage() {
                         >
                             {loading ? "Creating account..." : "Create Account"}
                         </button>
-
                     </form>
 
                     <p className="text-center text-sm text-ink-muted mt-6">
                         Already have an account?{" "}
-                        <Link href="/sign-in" className="text-brand-blue font-medium hover:underline">
+                        <Link href={`/sign-in?callbackUrl=${callbackUrl}`} className="text-brand-blue font-medium hover:underline">
                             Sign In
                         </Link>
                     </p>
@@ -115,5 +123,13 @@ export default function SignUpPage() {
 
             </div>
         </main>
+    )
+}
+
+export default function SignUpPage() {
+    return (
+        <Suspense>
+            <SignUpForm />
+        </Suspense>
     )
 }

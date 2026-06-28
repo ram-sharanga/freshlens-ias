@@ -6,8 +6,11 @@ export async function middleware(req: NextRequest) {
     const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard")
 
     if (isOnDashboard && !token) {
-        return NextResponse.redirect(new URL("/sign-in", req.url))
+        const url = new URL("/sign-in", req.url)
+        url.searchParams.set("callbackUrl", req.nextUrl.pathname)
+        return NextResponse.redirect(url)
     }
+
 
     return NextResponse.next()
 }
