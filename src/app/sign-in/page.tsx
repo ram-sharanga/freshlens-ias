@@ -40,8 +40,18 @@ function SignInForm() {
             return
         }
 
-        router.push(callbackUrl)
-        router.refresh()
+        // success — useEffect will handle redirect when status becomes authenticated
+    }
+
+    if (status === "authenticated" || loading) {
+        return (
+            <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
+                <div className="text-center">
+                    <div className="h-8 w-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-sm text-ink-muted">Redirecting...</p>
+                </div>
+            </main>
+        )
     }
 
     return (
@@ -84,10 +94,9 @@ function SignInForm() {
 
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-full rounded-xl bg-brand-blue py-3 text-sm font-semibold text-white hover:bg-brand-indigo transition-colors disabled:opacity-60"
+                            className="w-full rounded-xl bg-brand-blue py-3 text-sm font-semibold text-white hover:bg-brand-indigo transition-colors"
                         >
-                            {loading ? "Signing in..." : "Sign In"}
+                            Sign In
                         </button>
                     </form>
 
