@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, Suspense } from "react"
-import { signIn } from "next-auth/react"
+import { useState, Suspense, useEffect } from "react"
+import { useSession, signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 
@@ -9,8 +9,15 @@ function SignInForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard"
+    const { status } = useSession()
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (status === "authenticated") {
+            router.replace(callbackUrl)
+        }
+    }, [status, router, callbackUrl])
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
