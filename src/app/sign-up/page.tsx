@@ -13,7 +13,7 @@ function SignUpForm() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
-
+    if (status === "loading") return null
     if (status === "authenticated") {
         router.replace(callbackUrl)
         return null
