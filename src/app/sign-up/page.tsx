@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, Suspense } from "react"
-import { useSession } from "next-auth/react"
+import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 
@@ -9,15 +9,8 @@ function SignUpForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard"
-    const { status } = useSession()
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-
-    if (status === "loading") return null
-    if (status === "authenticated") {
-        router.replace(callbackUrl)
-        return null
-    }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -44,7 +37,6 @@ function SignUpForm() {
         }
 
         // Auto sign in after register
-        const { signIn } = await import("next-auth/react")
         const signInRes = await signIn("credentials", {
             email,
             password,
@@ -52,7 +44,7 @@ function SignUpForm() {
         })
 
         if (signInRes?.error) {
-            router.push(`/sign-in?callbackUrl=${callbackUrl}`)
+            router.push("/sign-in")
             return
         }
 
@@ -63,7 +55,6 @@ function SignUpForm() {
     return (
         <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
             <div className="w-full max-w-md">
-
                 <div className="text-center mb-8">
                     <Link href="/" className="text-2xl font-bold text-ink-primary">
                         FreshLens<span className="text-brand-blue">IAS</span>
@@ -73,7 +64,6 @@ function SignUpForm() {
 
                 <div className="bg-surface-0 rounded-2xl border border-surface-3 p-8 shadow-card">
                     <form onSubmit={handleSubmit} className="space-y-5">
-
                         <div>
                             <label className="block text-sm font-medium text-ink-primary mb-1.5">Full Name</label>
                             <input
@@ -123,12 +113,9 @@ function SignUpForm() {
 
                     <p className="text-center text-sm text-ink-muted mt-6">
                         Already have an account?{" "}
-                        <Link href={`/sign-in?callbackUrl=${callbackUrl}`} className="text-brand-blue font-medium hover:underline">
-                            Sign In
-                        </Link>
+                        <Link href="/sign-in" className="text-brand-blue font-medium hover:underline">Sign In</Link>
                     </p>
                 </div>
-
             </div>
         </main>
     )

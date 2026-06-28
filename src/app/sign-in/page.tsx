@@ -1,24 +1,16 @@
 "use client"
 
 import { useState, Suspense } from "react"
-import { useSession, signIn } from "next-auth/react"
+import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-
 
 function SignInForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard"
-    const { data: session, status } = useSession()
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-
-    if (status === "loading") return null
-    if (status === "authenticated") {
-        router.replace(callbackUrl)
-        return null
-    }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -32,15 +24,22 @@ function SignInForm() {
         const res = await signIn("credentials", {
             email,
             password,
-            callbackUrl,
-            redirect: true,
+            redirect: false,
         })
+
+        if (res?.error) {
+            setError("Invalid email or password")
+            setLoading(false)
+            return
+        }
+
+        router.push(callbackUrl)
+        router.refresh()
     }
 
     return (
         <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
             <div className="w-full max-w-md">
-
                 <div className="text-center mb-8">
                     <Link href="/" className="text-2xl font-bold text-ink-primary">
                         FreshLens<span className="text-brand-blue">IAS</span>
@@ -90,7 +89,6 @@ function SignInForm() {
                         <Link href="/sign-up" className="text-brand-blue font-medium hover:underline">Sign Up</Link>
                     </p>
                 </div>
-
             </div>
         </main>
     )
