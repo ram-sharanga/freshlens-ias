@@ -2,11 +2,10 @@
 
 import { useState, Suspense } from "react"
 import { signIn } from "next-auth/react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 
 function SignUpForm() {
-    const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard"
 
@@ -44,7 +43,7 @@ function SignUpForm() {
             return
         }
 
-        // Step 2 — auto sign in
+        // Step 2 — sign in
         const signInRes = await signIn("credentials", {
             email,
             password,
@@ -52,19 +51,17 @@ function SignUpForm() {
         })
 
         if (signInRes?.error) {
-            router.push("/sign-in")
+            window.location.href = "/sign-in"
             return
         }
 
-        // Step 3 — redirect
-        router.push(callbackUrl)
-        router.refresh()
+        // Step 3 — full page load so server re-renders navbar with session
+        window.location.href = callbackUrl
     }
 
     return (
         <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
             <div className="w-full max-w-sm">
-                {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="text-2xl font-bold text-ink-primary">
                         FreshLens<span className="text-brand-blue">IAS</span>
@@ -72,9 +69,7 @@ function SignUpForm() {
                     <p className="text-ink-muted mt-2 text-sm">Create your account</p>
                 </div>
 
-                {/* Card */}
                 <div className="bg-surface-0 rounded-2xl border border-surface-3 p-8 shadow-card space-y-5">
-                    {/* Name */}
                     <div className="space-y-1.5">
                         <label htmlFor="name" className="block text-sm font-medium text-ink-primary">
                             Full Name
@@ -90,7 +85,6 @@ function SignUpForm() {
                         />
                     </div>
 
-                    {/* Email */}
                     <div className="space-y-1.5">
                         <label htmlFor="email" className="block text-sm font-medium text-ink-primary">
                             Email
@@ -106,7 +100,6 @@ function SignUpForm() {
                         />
                     </div>
 
-                    {/* Password */}
                     <div className="space-y-1.5">
                         <label htmlFor="password" className="block text-sm font-medium text-ink-primary">
                             Password
@@ -123,14 +116,10 @@ function SignUpForm() {
                         />
                     </div>
 
-                    {/* Error */}
                     {error && (
-                        <p className="text-sm text-brand-red bg-brand-red/10 px-4 py-3 rounded-xl">
-                            {error}
-                        </p>
+                        <p className="text-sm text-brand-red bg-brand-red/10 px-4 py-3 rounded-xl">{error}</p>
                     )}
 
-                    {/* Submit */}
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
@@ -146,7 +135,6 @@ function SignUpForm() {
                         )}
                     </button>
 
-                    {/* Footer */}
                     <p className="text-center text-sm text-ink-muted">
                         Already have an account?{" "}
                         <Link href="/sign-in" className="text-brand-blue font-medium hover:underline">

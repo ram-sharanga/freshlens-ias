@@ -1,27 +1,18 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
-import { signIn, useSession } from "next-auth/react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState, Suspense } from "react"
+import { signIn } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 
 function SignInForm() {
-    const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard"
-    const { status } = useSession()
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-
-    useEffect(() => {
-        if (status === "authenticated") {
-            router.refresh()
-            setTimeout(() => router.replace(callbackUrl), 100)
-        }
-    }, [status, router, callbackUrl])
 
     async function handleSubmit() {
         if (!email || !password) {
@@ -41,14 +32,16 @@ function SignInForm() {
         if (res?.error) {
             setError("Invalid email or password.")
             setLoading(false)
+            return
         }
-        // On success, useEffect handles redirect when status → "authenticated"
+
+        // Full page reload — server re-renders navbar with fresh session
+        window.location.href = callbackUrl
     }
 
     return (
         <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
             <div className="w-full max-w-sm">
-                {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="text-2xl font-bold text-ink-primary">
                         FreshLens<span className="text-brand-blue">IAS</span>
@@ -56,9 +49,7 @@ function SignInForm() {
                     <p className="text-ink-muted mt-2 text-sm">Sign in to continue</p>
                 </div>
 
-                {/* Card */}
                 <div className="bg-surface-0 rounded-2xl border border-surface-3 p-8 shadow-card space-y-5">
-                    {/* Email */}
                     <div className="space-y-1.5">
                         <label htmlFor="email" className="block text-sm font-medium text-ink-primary">
                             Email
@@ -75,7 +66,6 @@ function SignInForm() {
                         />
                     </div>
 
-                    {/* Password */}
                     <div className="space-y-1.5">
                         <label htmlFor="password" className="block text-sm font-medium text-ink-primary">
                             Password
@@ -92,14 +82,10 @@ function SignInForm() {
                         />
                     </div>
 
-                    {/* Error */}
                     {error && (
-                        <p className="text-sm text-brand-red bg-brand-red/10 px-4 py-3 rounded-xl">
-                            {error}
-                        </p>
+                        <p className="text-sm text-brand-red bg-brand-red/10 px-4 py-3 rounded-xl">{error}</p>
                     )}
 
-                    {/* Submit */}
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
@@ -115,7 +101,6 @@ function SignInForm() {
                         )}
                     </button>
 
-                    {/* Footer */}
                     <p className="text-center text-sm text-ink-muted">
                         Don&apos;t have an account?{" "}
                         <Link href="/sign-up" className="text-brand-blue font-medium hover:underline">
