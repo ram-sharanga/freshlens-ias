@@ -24,17 +24,9 @@ function SignInForm() {
         const res = await signIn("credentials", {
             email,
             password,
-            redirect: false,
+            callbackUrl,
+            redirect: true,
         })
-
-        if (res?.error) {
-            setError("Invalid email or password")
-            setLoading(false)
-            return
-        }
-
-        router.push(callbackUrl)
-        router.refresh()
     }
 
     return (
