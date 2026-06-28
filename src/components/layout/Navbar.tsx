@@ -3,9 +3,11 @@ import { auth } from "@/auth"
 import { navItems } from "@/lib/constants"
 import MobileMenu from "./MobileMenu"
 import UserMenu from "@/components/layout/UserMenu"
+import { unstable_noStore as noStore } from "next/cache"
 
 export default async function Navbar() {
-    const session = await auth()
+  noStore()
+  const session = await auth()
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-surface-3 bg-surface-0/80 backdrop-blur-md">
