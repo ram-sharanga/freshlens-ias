@@ -15,9 +15,9 @@ function SignInForm() {
 
     useEffect(() => {
         if (status === "authenticated") {
-            router.replace(callbackUrl)
+            window.location.href = callbackUrl
         }
-    }, [status, router, callbackUrl])
+    }, [status, callbackUrl])
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()

@@ -50,8 +50,7 @@ function SignUpForm() {
         }
 
         // Step 3 — redirect
-        router.push(callbackUrl)
-        router.refresh()
+        window.location.href = callbackUrl
     }
 
     if (loading) {
