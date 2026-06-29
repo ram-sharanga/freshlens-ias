@@ -2,15 +2,28 @@
 
 import { useState, Suspense } from "react"
 import { signIn } from "next-auth/react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 
 function SignUpForm() {
-    const router = useRouter()
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard"
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+
+    const waitForSession = async () => {
+        for (let i = 0; i < 10; i++) {
+            const res = await fetch("/api/auth/session")
+            const session = await res.json()
+            if (session?.user) {
+                window.location.href = callbackUrl
+                return
+            }
+            await new Promise(resolve => setTimeout(resolve, 300))
+        }
+        setError("Something went wrong. Please try signing in.")
+        setLoading(false)
+    }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -45,13 +58,13 @@ function SignUpForm() {
         })
 
         if (signInRes?.error) {
-            router.push(`/sign-in?callbackUrl=${callbackUrl}`)
+            setError("Account created but sign in failed. Please sign in manually.")
+            setLoading(false)
             return
         }
 
-        // Step 3 — redirect
-        await new Promise(resolve => setTimeout(resolve, 500))
-        window.location.href = callbackUrl
+        // Step 3 — wait for session then redirect
+        await waitForSession()
     }
 
     if (loading) {
