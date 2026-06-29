@@ -5,12 +5,7 @@ import Link from "next/link"
 
 export const metadata = { title: "Dashboard — FreshLens IAS" }
 
-export default async function DashboardPage({
-    searchParams,
-}: {
-    searchParams: Promise<{ enrolled?: string }>
-}) {
-    const { enrolled } = await searchParams
+export default async function DashboardPage() {
     const session = await auth()
 
     const enrollments = await prisma.enrollment.findMany({
@@ -21,11 +16,6 @@ export default async function DashboardPage({
 
     return (
         <main className="min-h-screen bg-surface-1">
-            {enrolled && (
-                <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-sm font-medium text-center">
-                    ✅ Enrollment successful! Welcome to your new course.
-                </div>
-            )}
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
 
                 {/* Header */}
