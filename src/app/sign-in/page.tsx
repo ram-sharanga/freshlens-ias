@@ -11,20 +11,6 @@ function SignInForm() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
-    const waitForSession = async () => {
-        for (let i = 0; i < 10; i++) {
-            const res = await fetch("/api/auth/session")
-            const session = await res.json()
-            if (session?.user) {
-                window.location.href = callbackUrl
-                return
-            }
-            await new Promise(resolve => setTimeout(resolve, 300))
-        }
-        setError("Something went wrong. Please try signing in again.")
-        setLoading(false)
-    }
-
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setLoading(true)
@@ -46,7 +32,7 @@ function SignInForm() {
             return
         }
 
-        await waitForSession()
+        window.location.href = callbackUrl
     }
 
     if (loading) {
