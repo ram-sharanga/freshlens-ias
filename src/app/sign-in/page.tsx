@@ -35,17 +35,6 @@ function SignInForm() {
         window.location.href = callbackUrl
     }
 
-    if (loading) {
-        return (
-            <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
-                <div className="text-center">
-                    <div className="h-8 w-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-sm text-ink-muted">Signing in...</p>
-                </div>
-            </main>
-        )
-    }
-
     return (
         <main className="min-h-screen bg-surface-1 flex items-center justify-center px-4">
             <div className="w-full max-w-md">
@@ -64,8 +53,9 @@ function SignInForm() {
                                 name="email"
                                 type="email"
                                 required
+                                disabled={loading}
                                 placeholder="you@example.com"
-                                className="w-full rounded-xl border border-surface-3 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder:text-ink-muted focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all"
+                                className="w-full rounded-xl border border-surface-3 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder:text-ink-muted focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                             />
                         </div>
 
@@ -75,8 +65,9 @@ function SignInForm() {
                                 name="password"
                                 type="password"
                                 required
+                                disabled={loading}
                                 placeholder="••••••••"
-                                className="w-full rounded-xl border border-surface-3 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder:text-ink-muted focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all"
+                                className="w-full rounded-xl border border-surface-3 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder:text-ink-muted focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                             />
                         </div>
 
@@ -86,9 +77,10 @@ function SignInForm() {
 
                         <button
                             type="submit"
-                            className="w-full rounded-xl bg-brand-blue py-3 text-sm font-semibold text-white hover:bg-brand-indigo transition-colors"
+                            disabled={loading}
+                            className="w-full rounded-xl bg-brand-blue py-3 text-sm font-semibold text-white hover:bg-brand-indigo transition-colors disabled:opacity-60"
                         >
-                            Sign In
+                            {loading ? "Signing in..." : "Sign In"}
                         </button>
                     </form>
 
