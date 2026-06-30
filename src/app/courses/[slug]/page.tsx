@@ -149,7 +149,6 @@ export default async function CourseDetailPage({
                                     courseId={course.id}
                                     isFree={course.isFree}
                                     isEnrolled={isEnrolled}
-                                    courseSlug={course.slug}
                                 />
 
                                 <div className="mt-6 pt-6 border-t border-surface-2">
