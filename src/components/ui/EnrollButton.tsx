@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 
 interface EnrollButtonProps {
     courseId: string
@@ -11,6 +11,7 @@ interface EnrollButtonProps {
 
 export default function EnrollButton({ courseId, isFree, isEnrolled }: EnrollButtonProps) {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [loading, setLoading] = useState(false)
     const [enrolled, setEnrolled] = useState(isEnrolled)
 
@@ -30,14 +31,24 @@ export default function EnrollButton({ courseId, isFree, isEnrolled }: EnrollBut
         if (res.ok) {
             setEnrolled(true)
             router.refresh()
+            // clean up the URL
+            window.history.replaceState({}, "", window.location.pathname)
         } else {
             const data = await res.json()
             if (data.error === "Unauthorized") {
-                router.push(`/sign-in?callbackUrl=${window.location.pathname}`)
+                router.push(`/sign-in?callbackUrl=${window.location.pathname}?enroll=true`)
             }
         }
         setLoading(false)
     }
+
+    // Auto-enroll if redirected back with ?enroll=true
+    useEffect(() => {
+        if (searchParams.get("enroll") === "true" && !enrolled && isFree) {
+            handleEnroll()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     if (enrolled) {
         return (
@@ -56,7 +67,7 @@ export default function EnrollButton({ courseId, isFree, isEnrolled }: EnrollBut
             disabled={loading}
             className="w-full rounded-xl bg-brand-blue py-3.5 text-base font-semibold text-white hover:bg-brand-indigo transition-colors disabled:opacity-60"
         >
-            {loading ? "Processing..." : isFree ? "Enrol for Free" : "Buy Now"}
+            {loading ? "Processing..." : isFree ? "Enroll for Free" : "Buy Now"}
         </button>
     )
 }
