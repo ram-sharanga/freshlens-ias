@@ -15,28 +15,35 @@ export default function EnrollButton({ courseId, isFree, isEnrolled }: EnrollBut
     const [enrolled, setEnrolled] = useState(isEnrolled)
 
     async function handleEnroll() {
+        setLoading(true)
+
         if (!isFree) {
-            // Razorpay flow — coming next
-            router.push(`/checkout/${courseId}`)
+            window.location.href = `/checkout/${courseId}`
             return
         }
 
-        setLoading(true)
-        const res = await fetch("/api/enroll", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ courseId }),
-        })
+        try {
+            const res = await fetch("/api/enroll", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ courseId }),
+            })
 
-        if (res.ok) {
-            setEnrolled(true)
-            router.refresh()
-        } else {
             const data = await res.json()
-            if (data.error === "Unauthorized") {
-                router.push("/sign-in")
+
+            if (res.ok) {
+                setEnrolled(true)
+                router.refresh()
+            } else if (res.status === 401) {
+                window.location.href = `/sign-in?callbackUrl=${window.location.pathname}`
+                return
+            } else {
+                console.error("Enroll failed:", data.error)
             }
+        } catch (err) {
+            console.error("Enroll error:", err)
         }
+
         setLoading(false)
     }
 
