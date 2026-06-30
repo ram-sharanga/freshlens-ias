@@ -33,7 +33,7 @@ export default function EnrollButton({ courseId, isFree, isEnrolled }: EnrollBut
         } else {
             const data = await res.json()
             if (data.error === "Unauthorized") {
-                router.push("/sign-in")
+                router.push(`/sign-in?callbackUrl=${window.location.pathname}`)
             }
         }
         setLoading(false)
